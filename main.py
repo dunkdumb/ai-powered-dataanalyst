@@ -3,21 +3,16 @@ main.py
 Minimal ASGI entrypoint for Vercel deployment.
 """
 
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
+import json
 
 
-app = FastAPI(title="AI Powered Data Analyst")
-
-
-@app.get("/", response_class=HTMLResponse)
-async def home() -> str:
-    return """
+def _html() -> bytes:
+    return b"""
     <!doctype html>
-    <html lang="en">
+    <html lang=\"en\">
       <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset=\"utf-8\" />
+        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
         <title>AI Powered Data Analyst</title>
         <style>
           :root {
@@ -66,16 +61,16 @@ async def home() -> str:
         </style>
       </head>
       <body>
-        <main class="card">
+        <main class=\"card\">
           <h1>AI Powered Data Analyst</h1>
           <p>
-            The interactive Streamlit dashboard runs locally from <a href="/docs">docs</a>
-            in development. This Vercel entrypoint exists so the repository deploys cleanly.
+            The interactive Streamlit dashboard runs locally with <code>streamlit run app.py</code>.
+            This Vercel entrypoint exists so the repository deploys cleanly.
           </p>
-          <div class="grid">
-            <div class="item"><strong>Status</strong>Python app entrypoint detected</div>
-            <div class="item"><strong>Local UI</strong>Run <code>streamlit run app.py</code></div>
-            <div class="item"><strong>API</strong><a href="/health">Health check</a></div>
+          <div class=\"grid\">
+            <div class=\"item\"><strong>Status</strong>Python app entrypoint detected</div>
+            <div class=\"item\"><strong>Local UI</strong>Run <code>streamlit run app.py</code></div>
+            <div class=\"item\"><strong>API</strong><a href=\"/health\">Health check</a></div>
           </div>
         </main>
       </body>
@@ -83,6 +78,24 @@ async def home() -> str:
     """
 
 
-@app.get("/health")
-async def health() -> JSONResponse:
-    return JSONResponse({"status": "ok"})
+async def app(scope, receive, send):
+    if scope["type"] != "http":
+        return
+
+    path = scope.get("path", "/")
+    if path == "/health":
+        body = json.dumps({"status": "ok"}).encode("utf-8")
+        headers = [(b"content-type", b"application/json; charset=utf-8")]
+    else:
+        body = _html()
+        headers = [(b"content-type", b"text/html; charset=utf-8")]
+
+    await send({
+        "type": "http.response.start",
+        "status": 200,
+        "headers": headers,
+    })
+    await send({
+        "type": "http.response.body",
+        "body": body,
+    })
