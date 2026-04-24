@@ -1,0 +1,7 @@
+[project]
+name = "ai-powered-dataanalyst"
+version = "0.1.0"
+description = "AI powered data analyst tools with a local Streamlit dashboard."
+
+[tool.vercel]
+app = "main:app"
