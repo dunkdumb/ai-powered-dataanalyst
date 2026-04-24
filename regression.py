@@ -120,6 +120,11 @@ def predict_regression(model_path: str, input_data: dict) -> float:
                 val = encoders[col].transform([str(val)])[0]
             except ValueError:
                 val = 0
+        else:
+            try:
+                val = float(val)
+            except (ValueError, TypeError):
+                val = 0.0
         row.append(val)
 
     return float(model.predict([row])[0])

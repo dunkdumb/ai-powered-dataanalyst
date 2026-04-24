@@ -37,7 +37,7 @@ def extract_column_features(series: pd.Series) -> dict:
     # Date detection
     date_ratio = 0.0
     try:
-        parsed = pd.to_datetime(non_null, errors="coerce")
+        parsed = pd.to_datetime(non_null, errors="coerce", format="mixed")
         date_ratio = parsed.notna().sum() / max(len(non_null), 1)
     except Exception:
         pass
