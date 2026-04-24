@@ -71,9 +71,6 @@ python -m pip install -r requirements.txt
 python -m streamlit run app.py --server.port 8501
 ```
 
-### Vercel (deployment-safe experience)
-- Vercel serves the lightweight ASGI landing page from `main.py`.
-- This confirms deployment health but does not run the full Streamlit interactive dashboard there.
 
 ## Project Structure
 
